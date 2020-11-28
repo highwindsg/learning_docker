@@ -1,0 +1,25 @@
+In a Dockerfile, the command at the end that starts the application is:
+...
+...
+CMD ["mysqld"]
+
+A valid CMD in Dockerfile:
+eg. CMD command param1
+CMD sleep 5
+eg. CMD ["command", "param1"]
+CMD ["sleep", "5"]
+
+In a Dockerfile, a command can be appended by using ENTRYPOINT:
+
+FROM Ubuntu
+...
+ENTRYPOINT ["sleep"]
+...
+CMD ["5"]
+
+If there is a need to set a different entrypoint at runtime:
+$ docker run --entrypoint sleep2.0 ubuntu-sleeper 10
+
+Run an instance of the ubuntu image to run the sleep 1000 command at startup. Run it in detached mode.
+$ docker run -d --entrypoint sleep ubuntu 1000
+
