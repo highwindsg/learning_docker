@@ -1,24 +1,41 @@
+Creating a docker image using a Dockerfile to load the program.
+
+eg.
+Create a temporary folder.
+$ mkdir ~/my-simple-webapp
+$ cd ~/my-simple-webapp
+$ vi Dockerfile
+
+FROM ubuntu
+RUN apt-get update
+RUN apt-get install -y python3 python3-setuptools python3-dev build-essential python3-pip python3-mysqldb
+RUN pip3 install flask
+RUN pip3 install flask-mysql
+COPY app.py /opt/app.py     # This means copying the file from /opt into the image.
+ENTRYPOINT FLASK_APP=/opt/app.py flask run --host=0.0.0.0
+
+Assuming that the file /opt/app.py exist and the content of /opt/app.py is:
+
+import os
+from flask import Flask
+app = Flask(__name__)
+
+@app.route("/")
+def main():
+    return "Welcome! I'm Caven."
+
+@app.route('/how are you')
+def hello():
+    return 'I am good, how about you?'
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
+
+$ pwd
+~/my-simple-webapp$ docker build . -t my-simple-webapp
+
+
 In a Dockerfile, the command at the end that starts the application is:
 ...
 ...
 CMD ["mysqld"]
-
-A valid CMD in Dockerfile:
-eg. CMD command param1
-CMD sleep 5
-eg. CMD ["command", "param1"]
-CMD ["sleep", "5"]
-
-In a Dockerfile, a command can be appended by using ENTRYPOINT:
-
-FROM Ubuntu
-...
-ENTRYPOINT ["sleep"]
-...
-CMD ["5"]
-
-If there is a need to set a different entrypoint at runtime:
-$ docker run --entrypoint sleep2.0 ubuntu-sleeper 10
-
-Run an instance of the ubuntu image to run the sleep 1000 command at startup. Run it in detached mode.
-$ docker run -d --entrypoint sleep ubuntu 1000

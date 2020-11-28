@@ -1,0 +1,114 @@
+Creating or containerizing your own docker image.
+
+https://www.youtube.com/watch?v=zJ6WbK9zFpI&list=PLOgeKhf41meTmtKSF8IKOzFcfh28Ks7Cx&index=220&t=2032s
+44 mins.
+
+# Why do we want to create our own docker image?
+# Because we cannot find a suitable image app on hub.docker.com, or because we want to set up our own application for shipping to other place for easier deployment.
+
+
+To see the details information of a docker object:
+
+# Use the inspect command and provide the container name or ID:
+$ docker inspect eloquent_hypatia
+# Or,
+$ docker inspect 78c4b5c3e81d
+# This will show the info about the object in a json file format.
+
+# To see the environment variables of a container:
+$ docker inspect eloquent_hypatia | less
+/Env		# In the less paging mode, search for Env to see the environment
+variables that are set for this container, as shown below:
+"Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+
+Docker Volume mapping.
+
+Run mysql docker and mount a local path for the mysql data files store locally. So if you delete the mysql container, the data files are still on local.
+
+https://www.youtube.com/watch?v=zJ6WbK9zFpI&list=PLOgeKhf41meTmtKSF8IKOzFcfh28Ks7Cx&index=220&t=2032s
+
+# Pull down the image of MySql:
+$ docker pull mysql
+
+# So instead of executing straight away ‘docker run mysql’, we use option -v to map a local path dir, to the docker mysql data dir:
+$ docker run -v /opt/datadir:/var/lib/mysql mysql
+
+
+Docker run - tag
+
+# To run a redis image:
+$ docker run redis
+
+# But to run a particular version of the redis image:
+$ docker run redis:4.0	# This is a version tag and will download and run latest version of 4.0.x. Therefore :4.0 is the version tag.
+# In order to find more info on the available image versions, go to hub.docker.com
+
+
+Docker run in interactive terminal mode (-it)
+
+$ docker run -it kodekloud/simple-prompt-docker
+Welcome! Please enter your name: John
+
+Hello and Welcome John!
+$
+
+
+How to download docker images, but keep it and now run it.
+
+# This will pull the nginx image down to your computer but will not run it.
+$ docker pull nginx
+
+# To run the downloaded ngnix image later:
+$ docker run ngnix
+
+# To run a ubuntu container for eg. 50 seconds in the background:
+$ docker run ubuntu sleep 50 &
+$
+
+# Alternative to run the image in detached mode (-d) and get back the cmd prompt.
+$ docker run -d ubuntu sleep 50
+$ 
+
+# Then check what is the docker NAMES of the ubuntu running in the background.
+$ docker ps -a
+CONTAINER ID        IMAGE                    COMMAND                  CREATED              STATUS                          PORTS                NAMES
+4bd6bc0fab0c        ubuntu                   "sleep 50"               18 seconds ago       Up 16 seconds                                        nice_poitras
+$ 
+
+# If a ubuntu image with a name “nice_poitras’ is up when you run ‘docker ps -a’, and you want to view the hosts file:
+$ docker exec nice_poitras cat /etc/hosts
+127.0.0.1	localhost
+::1	localhost ip6-localhost ip6-loopback
+fe00::0	ip6-localnet
+ff00::0	ip6-mcastprefix
+ff02::1	ip6-allnodes
+ff02::2	ip6-allrouters
+172.17.0.2	4bd6bc0fab0c
+$ 
+
+
+How to view docker log files
+
+# Get the docker container id corresponding to the application when the docker images are running. Usually is a unique 12 alpha-numeric container id.
+$ docker ps
+
+# Then run the docker command below to see last 10 mins.
+$ docker logs --since 10 69d41a9cb532
+
+# To inspect the log file for a specific container id.
+$ docker inspect --format={{.LogPath}} 69d41a9cb532
+# The output location of the actual log file may be,
+/var/lib/docker/containers/69d41a9cb532/………-json.log
+# To lookout for the ‘error’ keyword in that log file,
+$ sudo grep error /var/lib/docker/containers/69d41a9cb532/………-json.log
+
+# To view the docker log file of a container id in realtime,
+$ tail -f `docker inspect --format={{.LogPath}} 69d41a9cb532`
+Or,
+$ docker logs -f 69d41a9cb532
+
+# To find out what container id has stopped or exited, could be due to error,
+$ docker ps --filter=“status=exited”
+
