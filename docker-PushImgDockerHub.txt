@@ -1,0 +1,11 @@
+Pushing an image to DockerHub on the Internet.
+To push a working image to DockerHub on the Internet for others to download.
+
+$ cd ~/my-simple-webapp
+$ docker build . -t highwind01/my-simple-webapp
+$ docker login
+Username: highwind01
+Password: P********1
+$ docker push highwind01/my-simple-webapp
+
+Then go to https://hub.docker.com, login as highwind01 and look in the Repositories.
