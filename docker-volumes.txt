@@ -1,0 +1,51 @@
+Docker volumes are stored locally on /var/lib/docker/volumes
+
+Volume mounting:
+
+To create a local mysql data volume:
+$ docker volume create data_volume
+
+To mount this new data_volume inside the docker container of mysql image:
+$ docker run -v data_volume:/var/lib/mysql mysql
+Therefore even if the container is destroyed, the data are still active in data_volume dir.
+
+If the 'docker volume create ...' command is not run to create the volume yet, 
+and the 'docker run -v ... ' is executed, then docker will automatically create the required volume
+in /var/lib/docker/volumes.
+
+Bind mounting:
+
+Instead of storing the data on docker's local /var/lib/docker/volumes, can also 'bind' the
+mounting dir on another local dir, or on another remote server's folder.
+$ docker run -v /data/mysql:/var/lib/mysql mysql
+
+
+A better way to bind the storage dir is to use the --mount option.
+$ docker run --mount type=bind,source=/data/mysql,target=/var/lib/mysql mysql
+where,
+--mount type is 'bind',
+local dir is '/data/mysql' and
+container dir is '/var/lib/mysql'
+
+
+Question:
+Run a mysql container again, but this time map a volume to the container so that the data stored 
+by the container is stored at /opt/data on the host.
+Use the same name : mysql-db and same password: db_pass123 as before. 
+Mysql stores data at /var/lib/mysql inside the container.
+$ docker run -d -e MYSQL_ROOT_PASSWORD=db_pass123 --name mysql-db --mount type=bind,source=/opt/data,target=/var/lib/mysql mysql
+
+Therefore, disaster strikes... and the database crashed. This time we have the data stored at /opt/data directory.
+Re-deploy a new mysql instance using the same options as before.
+Just run the same command as before above. Or use the '-v' mount volume option:
+$ docker run -v /opt/data:/var/lib/mysql -d --name mysql-db -e MYSQL_ROOT_PASSWORD=db_pass123 mysql
+
+
+Docker will choose the best device driver automatically based on the operating system.
+Available storage driver in Docker are:
+1. AUFS - only available in Ubuntu OS as the default docker storage driver.
+2. ZFS
+3. BTRFS
+4. Device Mapper - may be a better option in other OS.
+5. Overlay
+6. Overlay2
